@@ -1,4 +1,5 @@
-1. Trajectory tracking
+0. General introduction
+1. Trajectory tracking (Tracking.m)
 
 	1.1 Experimental background:
 
@@ -19,14 +20,14 @@
 
 		Multiple video clips will be recorded and saved for a single field type (frequency, magnitude, 
 		and signal type). These files are saved using the following name format:
-											  aV_bHz_c.avi
+						aV_bHz_c.avi
 		where a is the field magnitude shown on the function generator, which is amplified by 40 times
 		when used on the electrode; b is the frequency of the field, which could be different from the
 		frequency captured by the video due to the different frame rate of movie and camera capture; c
 		is the appendix to distinguish between different files under same condition, and Roman letters
 		are normally used. This name format applies to the experiments using square signal, and when
 		sinuosoidal signal is used, the name format is:
-											  aV_bHz_sin_c.avi
+						aV_bHz_sin_c.avi
 
 	1.3 Data processing and code algorithm:
 
