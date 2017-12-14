@@ -15,25 +15,29 @@ elseif isunix
     load(strcat(file.Path,'/Data/',file.File,'.mat'),'Traj');
 end
 fpp = file.Frame_per_Cycle;
+file_idx = 'NaN';
 for ptr_idx = 1:length(Traj)
 % for ptr_idx = [1]
-% Load an individual particle trajectory of a particle
+
     trajectory = Traj(ptr_idx).Trajectory;
-% Eliminate net drift by centralize the mean location, and then average over cycles
-    for i = 1:(length(trajectory)/fpp)
-        traj_ave((i-1)*fpp+1:i*fpp) = trajectory((i-1)*fpp+1:i*fpp) -mean(trajectory((i-1)*fpp+1:i*fpp));
+    
+    % subtract net drift, and then average displacement of each time point over cycles
+    mean_displacement = mean(trajectory);
+    traj_single_summary = [];
+    while ~isempty(trajectory)
+        traj_single_cycle = trajectory(1:file.Frame_per_Cycle);
+        traj_single_cycle = traj_single_cycle - mean(traj_single_cycle) + mean_displacement;
+        traj_single_summary = cat(1, traj_single_summary, traj_single_cycle);
+        trajectory(1:file.Frame_per_Cycle) = [];
     end
-    traj_ave = traj_ave + mean(trajectory);
-    for i = 1:fpp
-        traj_single(i) = -mean(traj_ave(i:fpp:end));
-    end
+    traj_single = mean(traj_single_summary,1);
     
     %% Use the first particle to find the phase lag in each video file
-    if exist('file_idx') == false || strcmp(file_idx, Traj(ptr_idx).Video_idx) == 0
+    if strcmp(file_idx, Traj(ptr_idx).Video_idx) == 0
         file_idx = Traj(ptr_idx).Video_idx;
-        [v_mean, curr_delay,e_field] = Particle_Dynamics_Function('y',traj_single, file, field, 0);
+        [v_mean, curr_delay,e_field] = FIT_FIELD_PHASE('y',traj_single, file, field, 0);
     else
-        [v_mean, ~, ~] = Particle_Dynamics_Function('n',traj_single, file, field, curr_delay);
+        [v_mean, ~, ~] = FIT_FIELD_PHASE('n',traj_single, file, field, curr_delay);
     end
     
     %% Sort the data to remove the phase lag
@@ -104,6 +108,7 @@ for ptr_idx = 1:length(Traj)
 %         title('Mobility & V_{pp}/d_g')
     end
     EP_Analysis(ptr_idx).Data = v_mean;
+    EP_Analysis(ptr_idx).EField = e_field;
     clear v_data v_mean
 end
 

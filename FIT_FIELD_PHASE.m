@@ -1,4 +1,4 @@
-function [x_data,curr_delay,e_field] = Particle_Dynamics_Function(check,x, file, field,curr_delay)
+function [x_data,curr_delay,e_field] = FIT_FIELD_PHASE(check,x, file, field,curr_delay)
     % x_data data structure (one entry less than displacement array):
     %   1. Absolute time
     %   2. Displacement

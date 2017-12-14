@@ -7,10 +7,12 @@ if ispc && exist(strcat(file.Path,'\Data\',file.File,'.mat'),'file') ~= 0
     load(strcat(file.Path,'\Data\',file.File,'.mat'));
 elseif isunix && exist(strcat(file.Path,'/Data/',file.File,'.mat'),'file')
     load(strcat(file.Path,'/Data/',file.File,'.mat'));
+else
+    fprintf('WARNING: no data file read')
 end
 fprintf(command);
 
-%% Select a movie file
+% color all particles' trajectories in a single movie file, identified by appendix
 file_idx = input('\nSelect a movie appendix(0: no appendix): ','s');
 if file_idx == '0'
     file.Full_file = file.File;
@@ -18,6 +20,7 @@ else
     file.Full_file = strcat(file.File,'_',file_idx);
 end
 
+% create a movie edit file
 video_reader_name = strcat(file.Full_file,'.avi');
 if ispc
     v0 = VideoReader(strcat(file.Path,'\',file.Full_file,'.avi'));
@@ -29,7 +32,6 @@ end
 v0.CurrentTime = file.Start;
 v1.FrameRate = file.Fps;
 open(v1);
-Time = 0;
 figure(4)
 clf
 for f = 1:file.Frame_per_Cycle*file.Tot_Cycle
@@ -45,7 +47,6 @@ for f = 1:file.Frame_per_Cycle*file.Tot_Cycle
     this_frame = getframe(gcf);
     hold off
     writeVideo(v1,this_frame.cdata);
-    Time = Time + 1/54;
 end
 close(v1);
 clear v0;
